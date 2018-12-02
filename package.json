@@ -1,0 +1,21 @@
+{
+  "name": "tk-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@types/node": "^10.12.11",
+    "winston": "^3.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^3.2.1"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "keywords": [],
+  "author": "Jordan Martin",
+  "license": "ISC"
+}
