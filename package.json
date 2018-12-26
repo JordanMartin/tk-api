@@ -1,7 +1,15 @@
 {
-  "name": "tk-api",
+  "name": "the-keys",
   "version": "1.0.0",
-  "description": "",
+  "description": "Control a connected lock The Keys",
+  "keywords": ["The Keys", "Lock", "Home Automation"],
+  "author": "Jordan Martin",
+  "homepage": "https://github.com/JordanMartin/the-keys/blob/master/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JordanMartin/the-keys.git"
+  },
+  "license": "GPL-3.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "dependencies": {
@@ -9,13 +17,12 @@
     "winston": "^3.1.0"
   },
   "devDependencies": {
-    "typescript": "^3.2.1"
+    "typescript": "^3.2.1",
+    "typedoc": "^0.13.0"
   },
   "scripts": {
     "build": "tsc",
-    "watch": "tsc -w"
-  },
-  "keywords": [],
-  "author": "Jordan Martin",
-  "license": "ISC"
+    "watch": "tsc -w",
+    "doc": "typedoc --out docs"
+  }
 }
