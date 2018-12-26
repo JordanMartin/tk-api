@@ -119,7 +119,10 @@ export class TheKeys {
 
 				const chunks: any[] = [];
 				res.on('data', chunk => chunks.push(chunk));
-				res.on('end', () => resolve(Buffer.concat(chunks).toString()));
+				res.on('end', () => {
+					const response = Buffer.concat(chunks).toString();
+					resolve(JSON.parse(response));
+				});
 			});
 
 			req.on('error', (err) => {

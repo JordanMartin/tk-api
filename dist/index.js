@@ -1,4 +1,4 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var Locker_1 = require("./Locker");
-exports.Locker = Locker_1.Locker;
+var the_keys_1 = require("./the-keys");
+exports.TheKeys = the_keys_1.TheKeys;
