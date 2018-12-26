@@ -15,18 +15,29 @@ const log = createLogger({
 });
 
 /**
- * Contrôle d'une serrure connecté TheKeys
+ * Control the smart lock The Keys
  */
-export class Locker {
+export class TheKeys {
 
+	/**
+	 * Build a new TheKeys
+	 * 
+	 * @param lockId Id of the Lock
+	 * @param gatewaySecret Secret code of the gateway
+	 * @param gatewayHost Host or ip of the gateway
+	 * @param gatewayPort The target port for the gateway (default is 80)
+	 */
 	constructor(
-		private lockerId: string,
+		private lockId: string,
+		private gatewaySecret: string,
 		private gatewayHost: string,
-		private gatewayCode: string
+		private gatewayPort: number = 80
 	) { }
 
 	/**
-	 * Ouvrir la serrure
+	 * Open the lock
+	 * 
+	 * @returns A promise with the response from the gateway
 	 */
 	public unlock(): Promise<any> {
 		log.info('Unlocking...');
@@ -34,7 +45,9 @@ export class Locker {
 	}
 
 	/**
-	 * Vérouiller la serrure
+	 * Close the lock
+	 * 
+	 * @returns A promise wiht the response from the gateway
 	 */
 	public lock(): Promise<any> {
 		log.info('Locking...');
@@ -42,7 +55,9 @@ export class Locker {
 	}
 
 	/**
-	 * Status de la serrure
+	 * Get status of the lock
+	 * 
+	 * @returns A promise with the json response from the gateway
 	 */
 	public status(): Promise<any> {
 		log.info('Get status...');
@@ -50,47 +65,53 @@ export class Locker {
 	}
 
 	/**
-	 * Génère la chaine d'authentifcation
-	 * De la forme: identifier=<locker_id>&ts=<ts>&hash=<hash>
+	 * Generate the authentification string
+	 * 
+	 * @returns the authentification string with the
+	 * template : identifier=<locker_id>&ts=<ts>&hash=<hash>
 	 */
 	private generateAuth(): string {
 		const timestamp = Math.floor(new Date().getTime() / 1000).toString();
-		const hash = this.hash(timestamp, this.gatewayCode);
-		return `identifier=${this.lockerId}&ts=${timestamp}&hash=${hash}`;
+		const hash = this.hmacSha256(timestamp, this.gatewaySecret);
+		return `identifier=${this.lockId}&ts=${timestamp}&hash=${hash}`;
 	}
 
 	/**
-	 * Calcul le hash (HMAC-SHA256) à partir du timestamp et du code
+	 * Compute the HMAC-SHA256 in base64
 	 * 
-	 * @param timestamp Timestamp à hasher
-	 * @param code Secret pour 
+	 * @param data The data to hash
+	 * @param key The secret
+	 * @returns The HMAC-SHA256 encoded in base64
 	 */
-	private hash(timestamp: string, code: string) {
-		const hmac = crypto.createHmac('sha256', code);
-		hmac.update(timestamp);
+	private hmacSha256(data: string, key: string) {
+		const hmac = crypto.createHmac('sha256', key);
+		hmac.update(data);
 		return hmac.digest('base64');
 	}
 
 	/**
-	 * Appel l'api avec la chaine d'authentification
+	 * Call The Keys api. This call includes the authentification
 	 * 
-	 * @param path Chemin vers le service
+	 * @param path Path of the service
+	 * @returns The json response from the gateway
 	 */
 	private apiPost(path: string) {
 		return new Promise((resolve, reject) => {
 
 			log.debug('> POST ' + this.gatewayHost + path)
 
+			// Get the auth data
 			const authData = this.generateAuth();
 
 			const options = {
 				method: 'POST',
 				hostname: this.gatewayHost,
 				path: path,
+				port: this.gatewayPort,
 				headers: {
 					'Content-Type': 'application/x-www-form-urlencoded',
 					'Content-Length': Buffer.byteLength(authData)
-				}
+				},
 			};
 
 			const req = http.request(options, (res) => {

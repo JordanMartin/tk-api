@@ -1,3 +1,3 @@
-import { Locker } from './Locker';
+import { TheKeys } from './the-keys';
 
-export { Locker };
+export { TheKeys };
